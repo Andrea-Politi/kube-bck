@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: plesk-main
+  name: plesk-main
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 30680
+    port: 8880
+    protocol: TCP
+    targetPort: 8880
+  selector:
+    app: plesk-main
+  sessionAffinity: None
+  type: LoadBalancer

@@ -1,0 +1,43 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '16'
+  labels:
+    app: pornkapp
+  name: pornkapp
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pornkapp
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: pornkapp
+    spec:
+      containers:
+      - image: drs.gingerapp.com/pornk:1.12
+        imagePullPolicy: Always
+        name: pornk
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: key2
+      nodeSelector:
+        dedicated: worker
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30

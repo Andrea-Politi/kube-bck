@@ -1,0 +1,81 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '28'
+  labels:
+    app: wordpress
+  name: wordpress
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: wordpress
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: wordpress
+    spec:
+      containers:
+      - env:
+        - name: PMA_HOST
+          value: mysql
+        image: phpmyadmin/phpmyadmin
+        imagePullPolicy: Always
+        name: phpmyadmin
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      - env:
+        - name: WORDPRESS_DB_NAME
+          value: root_leadwp
+        - name: WORDPRESS_DB_HOST
+          value: mysql:3306
+        - name: WORDPRESS_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              key: password
+              name: wp-lead4-pass
+        - name: WORDPRESS_DB_USER
+          value: root_leadwp
+        image: drs.gingerapp.com/apac-php54-centos:1.1
+        imagePullPolicy: Always
+        name: wordpress
+        ports:
+        - containerPort: 80
+          name: wordpress
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/www
+          name: wordpress-storage
+        - mountPath: /etc/php.d/conf
+          name: ioncube-conf
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: seckey
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext:
+        supplementalGroups:
+        - 33
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: 20ioncube.ini
+            path: 20ioncube.ini
+          name: ioncube
+        name: ioncube-conf
+      - name: wordpress-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc-wp

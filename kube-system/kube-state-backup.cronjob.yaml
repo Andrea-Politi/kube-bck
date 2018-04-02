@@ -1,0 +1,60 @@
+apiVersion: batch/v2alpha1
+kind: CronJob
+metadata:
+  annotations: {}
+  labels:
+    app: kube-backup
+  name: kube-state-backup
+spec:
+  concurrencyPolicy: Replace
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+    spec:
+      template:
+        metadata:
+          creationTimestamp: null
+          labels:
+            app: kube-backup
+          name: kube-backup
+        spec:
+          containers:
+          - env:
+            - name: GIT_REPO
+              value: git@github.com:Andrea-Politi/kube-bck.git
+            - name: GIT_LOGIN
+              value: Andrea-Politi
+            - name: RESOURCETYPES
+              value: ingress deployment configmap svc rc ds thirdpartyresource networkpolicy
+                statefulset storageclass cronjob
+            image: drs.gingerapp.com/kube-bck:2.5
+            imagePullPolicy: Always
+            name: backup
+            resources: {}
+            terminationMessagePath: /dev/termination-log
+            terminationMessagePolicy: File
+            volumeMounts:
+            - mountPath: /root/
+              name: cache
+            - mountPath: /root/.ssh
+              name: sshkey
+          dnsPolicy: ClusterFirst
+          imagePullSecrets:
+          - name: registry
+          restartPolicy: OnFailure
+          schedulerName: default-scheduler
+          securityContext: {}
+          serviceAccount: kube-backup
+          serviceAccountName: kube-backup
+          terminationGracePeriodSeconds: 30
+          volumes:
+          - name: sshkey
+            secret:
+              defaultMode: 384
+              secretName: kube-bck-ssh
+          - emptyDir: {}
+            name: cache
+  schedule: '*/3 * * * *'
+  successfulJobsHistoryLimit: 3
+  suspend: false

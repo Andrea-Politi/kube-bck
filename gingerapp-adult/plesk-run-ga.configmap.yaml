@@ -1,0 +1,32 @@
+apiVersion: v1
+data:
+  run.sh: 'cp /var/lib/mysql/cert* /opt/psa/var/certificates/
+
+    rm -f /etc/apache2/mods-enabled/fcgid*
+
+    cp /var/lib/mysql/.psa.shadow /etc/psa/
+
+    cp /var/lib/mysql/secret_key /etc/psa/private/
+
+    cp /var/lib/mysql/my.cnf /etc/mysql/
+
+    echo "IncludeOptional /var/www/vhosts/system/*/conf/httpd.conf" >> /etc/apache2/apache2.conf
+
+    sed -i ''/root/d'' /etc/shadow && cat /var/lib/mysql/.root-shadow >> /etc/shadow
+
+    export PATH=/usr/lib/plesk-9.0:/usr/lib64/plesk-9.0:$PATH
+
+    service mysql start
+
+    psa_service execute_actions
+
+    psa_service startall
+
+    plesk sbin pleskrc nginx start
+
+    exec plesk log --all
+
+    '
+kind: ConfigMap
+metadata:
+  name: plesk-run-ga

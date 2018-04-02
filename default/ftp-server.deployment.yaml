@@ -1,0 +1,97 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '18'
+  labels:
+    app: ftp-server
+  name: ftp-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ftp-server
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: ftp-server
+    spec:
+      containers:
+      - image: drs.gingerapp.com/pure-ftpd:1.3
+        imagePullPolicy: Always
+        name: ftp-server
+        ports:
+        - containerPort: 21
+          name: ftp-server
+          protocol: TCP
+        - containerPort: 20
+          protocol: TCP
+        - containerPort: 30101
+          protocol: TCP
+        - containerPort: 30102
+          protocol: TCP
+        - containerPort: 30103
+          protocol: TCP
+        - containerPort: 30104
+          protocol: TCP
+        - containerPort: 30105
+          protocol: TCP
+        - containerPort: 30106
+          protocol: TCP
+        - containerPort: 30107
+          protocol: TCP
+        - containerPort: 30108
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /home/ftpusers
+          name: ban-storage
+        - mountPath: /etc/pure-ftpd/passwd
+          name: passwd-file
+      - image: nginx
+        imagePullPolicy: Always
+        name: nginx
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /etc/nginx/conf.d
+          name: nginx
+        - mountPath: /home/ftpusers
+          name: ban-storage
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: new-key
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: default.conf
+            path: nginx.conf
+          name: nginx.conf
+        name: nginx
+      - name: ban-storage
+        persistentVolumeClaim:
+          claimName: nfs-pvc-ban
+      - configMap:
+          defaultMode: 420
+          items:
+          - key: pureftpd.passwd
+            path: pureftpd.passwd
+          name: passwd
+        name: passwd-file

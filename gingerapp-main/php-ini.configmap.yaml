@@ -1,0 +1,30 @@
+apiVersion: v1
+data:
+  php.ini: 'short_open_tag = On
+
+    zend_extension = /var/www/lib/ioncube/64/ioncube_loader_lin_5.4.so
+
+    extensions_dir = /usr/lib64/php/modules
+
+    ;;; log php errors
+
+    display_startup_errors = false
+
+    display_errors = false
+
+    html_errors = false
+
+    log_errors = true
+
+    track_errors = true
+
+    error_reporting = E_ALL | E_STRICT
+
+    log_errors_max_len = 0
+
+    error_log = /var/log/httpd/php_error.log
+
+    '
+kind: ConfigMap
+metadata:
+  name: php-ini

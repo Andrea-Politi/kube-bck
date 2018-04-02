@@ -1,0 +1,49 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    deployment.kubernetes.io/revision: '9'
+  labels:
+    app: plesk
+  name: plesk
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plesk
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: plesk
+    spec:
+      containers:
+      - image: drs.gingerapp.com/plesk-img:2.0
+        imagePullPolicy: Always
+        name: plesk
+        ports:
+        - containerPort: 8880
+          name: plesk
+          protocol: TCP
+        resources: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+        volumeMounts:
+        - mountPath: /var/lib
+          name: mysql-plesk
+      dnsPolicy: ClusterFirst
+      imagePullSecrets:
+      - name: seckey
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+      - name: mysql-plesk
+        persistentVolumeClaim:
+          claimName: nfs-pvc-wp

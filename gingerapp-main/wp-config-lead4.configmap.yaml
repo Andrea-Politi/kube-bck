@@ -1,0 +1,14 @@
+apiVersion: v1
+data:
+  wp-config: 'define(''DB_NAME'', ''root_leadwp'');
+
+    define(''DB_USER'', ''root_leadwp'');
+
+    define(''DB_PASSWORD'', ''Lino3045'');
+
+    define(''DB_HOST'', ''mysql'');
+
+    '
+kind: ConfigMap
+metadata:
+  name: wp-config-lead4
