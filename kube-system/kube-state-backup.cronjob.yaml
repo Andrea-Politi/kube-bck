@@ -55,6 +55,6 @@ spec:
               secretName: kube-bck-ssh
           - emptyDir: {}
             name: cache
-  schedule: '*/3 * * * *'
+  schedule: 3 6 * * *
   successfulJobsHistoryLimit: 3
   suspend: false
