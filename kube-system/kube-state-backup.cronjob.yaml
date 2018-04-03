@@ -28,7 +28,7 @@ spec:
             - name: RESOURCETYPES
               value: ingress deployment configmap svc rc ds thirdpartyresource networkpolicy
                 statefulset storageclass cronjob
-            image: drs.gingerapp.com/kube-bck:2.5
+            image: drs.gingerapp.com/kube-bck:2.6
             imagePullPolicy: Always
             name: backup
             resources: {}
@@ -55,6 +55,6 @@ spec:
               secretName: kube-bck-ssh
           - emptyDir: {}
             name: cache
-  schedule: 3 6 * * *
+  schedule: 3 * * * *
   successfulJobsHistoryLimit: 3
   suspend: false
